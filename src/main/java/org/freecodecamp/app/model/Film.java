@@ -14,12 +14,6 @@ public class Film {
     
     public Film() {}
     
-    public Film(short filmId, String title, short length) {
-        this.filmId = filmId; 
-        this.title = title; 
-        this.length = length;
-    }
-    
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "film_id")
