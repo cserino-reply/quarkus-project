@@ -25,6 +25,8 @@ hs_err_pid*
 replay_pid*
 target/
 src/main/resources/application.properties
-.settings/org.eclipse.core.resources.prefs
-.settings/org.eclipse.jdt.apt.core.prefs
-.settings/org.eclipse.jdt.core.prefs
+commands
+run.sh
+sonar-project.properties
+.mvn/jvm.config
+.vscode/settings.json
