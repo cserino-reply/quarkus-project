@@ -2,11 +2,17 @@ package org.freecodecamp.app;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.Consumes;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import java.sql.Timestamp;
 import org.freecodecamp.app.model.Film;
 import org.freecodecamp.app.repository.FilmRepository;
+import org.freecodecamp.app.dto.CreateFilmRequest;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,6 +69,31 @@ public class FilmResource {
         return filmRepository.getFilms(minLength)
                 .map(f -> String.format("%s (%d min) - $%f", f.getTitle(), f.getLength(), f.getRentalRate()))
                 .collect(Collectors.joining("\n"));
+    }
+
+    @POST
+    @Path("/film")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Transactional  // ← IMPORTANTE: necessario per scrivere nel database
+    public String createFilm(@Valid CreateFilmRequest request) {
+        // Map DTO to entity
+        Film film = new Film();
+        film.setTitle(request.getTitle());
+        film.setDescription(request.getDescription());
+        film.setLanguageId(request.getLanguageId());
+        film.setOriginalLanguageId(request.getOriginalLanguageId());
+        film.setRentalDuration(request.getRentalDuration());
+        film.setRentalRate(request.getRentalRate());
+        film.setLength(request.getLength());
+        film.setReplacementCost(request.getReplacementCost());
+        film.setRating(request.getRating());
+        film.setSpecialFeatures(request.getSpecialFeatures());
+        film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+
+        filmRepository.createFilm(film);
+
+        return String.format("%s (%d min) - $%f", film.getTitle(), film.getLength(), film.getRentalRate());
     }
     
 }

@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @ApplicationScoped
-public class FilmRepository {
+public class FilmRepository implements PanacheRepository<Film> {
     
     @Inject
     JPAStreamer jpaStreamer; 
@@ -48,14 +48,17 @@ public class FilmRepository {
                 .filter(Film$.title.startsWith(startsWith).and(Film$.length.greaterThan(minLength)))
                 .sorted(Film$.length.reversed());
     }
-    
+
     @Transactional
     public void updateRentalRate(short minLength, Float rentalRate) {
         jpaStreamer.stream(Film.class)
-                .filter(Film$.length.greaterThan(minLength))
-                .forEach(f -> {
-                    f.setRentalRate(rentalRate);
-                });
+            .filter(Film$.length.greaterThan(minLength))
+            .forEach(f -> f.setRentalRate(rentalRate));
+}
+    
+    public Film createFilm(Film film) {
+        persist(film);
+        return film;
     }
     
 }
