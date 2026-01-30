@@ -30,3 +30,7 @@ run.sh
 sonar-project.properties
 .mvn/jvm.config
 .vscode/settings.json
+
+# cartelle di studio (Davide)
+src/main/studio/
+src/main/studio images/

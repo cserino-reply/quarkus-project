@@ -13,15 +13,21 @@ import java.sql.Timestamp;
 import org.freecodecamp.app.model.Film;
 import org.freecodecamp.app.repository.FilmRepository;
 import org.freecodecamp.app.dto.CreateFilmRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Path("/")
 public class FilmResource {
     
     @Inject
-    FilmRepository filmRepository; 
+    FilmRepository filmRepository;
+    
+    @Inject
+    EntityManager entityManager; 
     
     @GET
     @Path("/helloWorld")
@@ -96,4 +102,19 @@ public class FilmResource {
         return String.format("%s (%d min) - $%f", film.getTitle(), film.getLength(), film.getRentalRate());
     }
     
+    // VULNERABLE ENDPOINT - SQL INJECTION FOR TESTING CODEQL
+    @GET
+    @Path("/searchFilm/{title}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String searchFilmVulnerable(String title) {
+        // VULNERABLE: Direct string concatenation in SQL query
+        String sqlQuery = "SELECT f FROM Film f WHERE f.title LIKE '%" + title + "%'";
+        Query query = entityManager.createQuery(sqlQuery);
+        List<Film> results = query.getResultList();
+        
+        return results.stream()
+                .map(f -> String.format("%s (%d min)", f.getTitle(), f.getLength()))
+                .collect(Collectors.joining("\n"));
+    }
+
 }
