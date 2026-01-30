@@ -76,9 +76,10 @@ public class FilmResource {
     @Path("/searchFilm/{title}")
     @Produces(MediaType.TEXT_PLAIN)
     public String searchFilmVulnerable(String title) {
-        // VULNERABLE: Direct string concatenation in SQL query
-        String sqlQuery = "SELECT f FROM Film f WHERE f.title LIKE '%" + title + "%'";
-        Query query = entityManager.createQuery(sqlQuery);
+        // Use a parameterized JPQL query instead of string concatenation
+        String jpql = "SELECT f FROM Film f WHERE f.title LIKE :title";
+        Query query = entityManager.createQuery(jpql);
+        query.setParameter("title", "%" + title + "%");
         List<Film> results = query.getResultList();
         
         return results.stream()
