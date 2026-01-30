@@ -8,14 +8,21 @@ import jakarta.ws.rs.core.MediaType;
 import org.freecodecamp.app.model.Film;
 import org.freecodecamp.app.repository.FilmRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Path("/")
 public class FilmResource {
     
     @Inject
     FilmRepository filmRepository; 
+
+    @Inject
+    EntityManager entityManager; 
     
     @GET
     @Path("/helloWorld")
@@ -64,5 +71,19 @@ public class FilmResource {
                 .map(f -> String.format("%s (%d min) - $%f", f.getTitle(), f.getLength(), f.getRentalRate()))
                 .collect(Collectors.joining("\n"));
     }
-    
+ 
+    @GET
+    @Path("/searchFilm/{title}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String searchFilmVulnerable(String title) {
+        // VULNERABLE: Direct string concatenation in SQL query
+        String sqlQuery = "SELECT f FROM Film f WHERE f.title LIKE '%" + title + "%'";
+        Query query = entityManager.createQuery(sqlQuery);
+        List<Film> results = query.getResultList();
+        
+        return results.stream()
+                .map(f -> String.format("%s (%d min)", f.getTitle(), f.getLength()))
+                .collect(Collectors.joining("\n"));
+    }
+
 }
