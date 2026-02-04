@@ -74,13 +74,14 @@ public class FilmResource {
     @Path("/searchFilm/{title}")
     @Produces(MediaType.TEXT_PLAIN)
     public String searchFilmVulnerable(String title) {
-        String sqlQuery = "SELECT f FROM Film f WHERE f.title LIKE '%" + title + "%'";
+        String sqlQuery = "SELECT f FROM Film f WHERE f.title LIKE :title";
         Query query = entityManager.createQuery(sqlQuery);
+        query.setParameter("title", "%" + title + "%");
         List<Film> results = query.getResultList();
 
         return results.stream()
-        .map(f -> String.format("%s (%d min)", f.getTitle(), f.getLength()))
-        .collect(Collectors.joining("\n"));
+                .map(f -> String.format("%s (%d min)", f.getTitle(), f.getLength()))
+                .collect(Collectors.joining("\n"));
     
     }
 }
