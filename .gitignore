@@ -24,3 +24,8 @@ hs_err_pid*
 replay_pid*
 target/
 src/main/resources/application.properties
+commands
+run.sh
+sonar-project.properties
+.mvn/jvm.config
+.vscode/settings.json

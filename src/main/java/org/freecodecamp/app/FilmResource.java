@@ -1,6 +1,8 @@
 package org.freecodecamp.app;
 
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -8,12 +10,15 @@ import jakarta.ws.rs.core.MediaType;
 import org.freecodecamp.app.model.Film;
 import org.freecodecamp.app.repository.FilmRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path("/")
 public class FilmResource {
-    
+    @Inject
+    EntityManager entityManager;
+
     @Inject
     FilmRepository filmRepository; 
     
@@ -65,4 +70,18 @@ public class FilmResource {
                 .collect(Collectors.joining("\n"));
     }
     
+    @GET
+    @Path("/searchFilm/{title}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String searchFilmVulnerable(String title) {
+        String sqlQuery = "SELECT f FROM Film f WHERE f.title LIKE :title";
+        Query query = entityManager.createQuery(sqlQuery);
+        query.setParameter("title", "%" + title + "%");
+        List<Film> results = query.getResultList();
+
+        return results.stream()
+                .map(f -> String.format("%s (%d min)", f.getTitle(), f.getLength()))
+                .collect(Collectors.joining("\n"));
+    
+    }
 }
